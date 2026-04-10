@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Humor Viewer</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Georgia', serif;
+  min-height: 100vh;
+  background: #f7f5f0;
+  color: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Top bar ── */
+#topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.6rem;
+  border-bottom: 1px solid #ddd9d0;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  background: #f7f5f0;
+  z-index: 10;
+}
+
+#theme-label {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-align: center;
+  flex: 1;
+  color: #1a1a1a;
+}
+
+#counter {
+  font-size: 1.1rem;
+  color: #666;
+  text-align: center;
+  margin-top: 0.2rem;
+  font-weight: 600;
+}
+
+/* in mode 2 hide the single theme label (each half shows its own) */
+body.mode2 #theme-label { display: none; }
+
+.nav-btn {
+  background: none;
+  border: 1px solid #ccc;
+  color: #555;
+  border-radius: 5px;
+  padding: 0.4rem 1rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.nav-btn:hover { border-color: #888; color: #1a1a1a; }
+.nav-btn:disabled { opacity: 0.2; cursor: default; }
+
+#mode-btn, #play-btn {
+  background: none;
+  border: 1px solid #ccc;
+  color: #888;
+  border-radius: 5px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  font-family: 'Courier New', monospace;
+  white-space: nowrap;
+}
+#mode-btn:hover, #play-btn:hover { border-color: #888; color: #1a1a1a; }
+
+#timer {
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  color: #1a1a1a;
+  min-width: 3.5rem;
+  text-align: center;
+}
+#timer.running { color: #c53030; }
+
+/* ── MODE 1: single column ── */
+#stage {
+  flex: 1;
+  padding: 2.5rem 5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.joke-block {
+  padding: 1.8rem 0;
+  border-bottom: 1px solid #e5e1d8;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.joke-block:last-child { border-bottom: none; }
+
+.joke-label {
+  font-size: 1.1rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #888;
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+}
+
+.joke-text {
+  font-size: 1.5rem;
+  line-height: 1.75;
+  color: #1a1a1a;
+  font-weight: 400;
+}
+
+/* ── MODE 2: split screen ── */
+body.mode2 #stage {
+  flex-direction: row;
+  padding: 0;
+  gap: 0;
+  align-items: stretch;
+}
+
+.half {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.half-left  { background: #fef08a; border-right: 2px solid #d4b800; }
+.half-right { background: #93c5fd; }
+
+.half-theme-label {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: #1a1a1a;
+  padding: 0.75rem 1rem 0.25rem;
+  font-family: 'Georgia', serif;
+  text-transform: capitalize;
+}
+
+.half-jokes {
+  flex: 1;
+  padding: 1.5rem 3.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+body.mode2 .joke-block {
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  padding: 1.4rem 0;
+}
+body.mode2 .joke-block:last-child { border-bottom: none; }
+body.mode2 .joke-text { font-size: 1.7rem; line-height: 1.8; }
+body.mode2 .joke-label { color: #333; font-size: 1.2rem; }
+
+@media (max-width: 760px) {
+  #stage { padding: 1.5rem; }
+  .joke-text { font-size: 1.1rem; }
+  body.mode2 #stage { flex-direction: column; }
+  .half-left { border-right: none; border-bottom: 2px solid #d4b800; }
+  .half-jokes { padding: 1.5rem; justify-content: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Prev</button>
+  <div style="flex:1;text-align:center;min-width:0">
+    <div id="theme-label"></div>
+    <div id="counter"></div>
+  </div>
+  <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+  <span id="timer">1:00</span>
+  <button id="play-btn" onclick="togglePlay()">&#9654; Play</button>
+  <button id="mode-btn" onclick="toggleMode()">Mode&nbsp;2</button>
+</div>
+
+<div id="stage"></div>
+
+<script>
+const THEMES = ["Buying things you don't need online", "Awkward family gatherings", "Streaming service algorithms (e.g., Netflix recommendations)", "Coffee shop baristas and complicated orders", "Commuting in heavy traffic", "Job interviews", "Keeping houseplants alive", "Forgetting passwords", "High school reunions", "Assembling flat-pack furniture (e.g., IKEA)", "Tech support/Helping parents with technology", "Alarm clocks and waking up early", "The culture of social media influencers", "Cryptocurrencies or \"Tech Bros\"", "Going to the dentist", "Moving to a new apartment", "Annoying neighbors", "Overpacking for a vacation", "Modern dating apps (Tinder, Bumble, etc.)", "Public transportation/Subways", "Wedding planning", "Autocorrect text message fails", "Procrastination", "Group chats that never stop buzzing", "The cost of living/Being broke", "Getting a bad haircut", "Overly complicated modern fitness trends", "People who talk at the movie theater", "Cooking disasters", "Small talk about the weather", "Modern fashion trends", "Waiting in doctors' offices", "Getting older/Turning 30", "Video game culture", "Corporate buzzwords (e.g., \"Synergy\")", "Dealing with landlords", "Astrological signs/Horoscopes", "People who overshare online", "Veganism or extreme dietary restrictions", "Trying to assemble a tent/Camping"];
+const DATA   = {"Buying things you don't need online":["I bought a waffle maker because it said \"1000+ ratings\" — turns out I was just buying the same person's opinion over and over.","I bought a futuristic smart mirror online that tells me I look great—turns out, it just read my credit card expiration date out loud.","I bought a life-sized cardboard cutout of a cactus online... now my apartment's just a desert of regret."],"Awkward family gatherings":["Thanksgiving dinner with all the relatives is like a horror movie where the killer is just really bad boundaries.","I asked my uncle if he's seen my cousin, and he said, \"Yeah, he's in the bathroom crying because he accidentally liked a Facebook post from his ex.\" I said, \"That's not awkward, that's just basic human drama.\"","My family’s so awkward together, we could win a reality show — the tagline would be, “No drama, just disapproval.”"],"Streaming service algorithms (e.g., Netflix recommendations)":["I asked Netflix what I should watch next and it said, \"Based on your history, you might like this show about a guy who's really good at guessing what you want to watch.\"","I hate how my streaming service recommends shows because every time I watch something, it’s like the algorithm says, “Ah, you’re into *this*? Here, watch it again, but with a slightly different logo.”","I love how the Netflix algorithm thinks I'm a \"Mystery Buff\" after I watched one episode of *Sherlock* from 2009. Next thing I know, I'm getting deep into true crime documentaries at 2 a.m. All because of a *single* episode I binged while my phone was possessed."],"Coffee shop baristas and complicated orders":["I asked for a black coffee and they said, \"Sure, but would you like that with a side of judgment?\"","I went to a café where the barista asked if I wanted oat milk or almond milk. I said, “Just regular milk,” and she looked at me like I’d asked for a time machine.","I went to a coffee shop and ordered a \"milk-based drink with espresso.\" The barista looked at me like I just asked for a horse."],"Commuting in heavy traffic":["I asked the traffic jam if it was ever going to end, and it said, \"Not unless you're a really good driver... and I don't think you are.\"","I love how commuting in heavy traffic teaches you patience… until you see the truck in front of you eating a sandwich and you realize it’s testing your limits.","Every time I get stuck in traffic, I imagine the GPS voice saying, \"Take a deep breath... for once, there's literally nowhere to go.\""],"Job interviews":["I went to a job interview and the whole time the manager kept saying, \"But what *makes you unique?*\" So I said, \"I can’t wait to find out.\"","I asked the interviewer if I could bring my resume in a backpack, and he said, \"Sure, but if you're not hired, we're keeping the backpack.\"","I went to a job interview where they said, \"We value honesty above all.\" So I told them I’d never worked a day in my life and set my resume on fire. They’re still deciding if I’m a rebel... or just a liability."],"Keeping houseplants alive":["I tried to keep a houseplant alive, and now it's the only one in the house that's more responsible than me.","I bought a cactus to learn responsibility — now I'm just waiting for it to die so I can feel something.","I bought a cactus to keep me alive, but now I’m worried it’s just trying to make a point."],"Forgetting passwords":["I forgot my password again, so I had to answer my own security questions. Fortunately, I still remember who I am.","I tried to reset my password, but I forgot the answer to my security question... which was \"What's your favorite color?\" Turns out, I'm colorblind *and* identity-crisis-level confused.","I forgot my password again, so I tried \"password\"—still doesn’t work. Turns out, even my phone doesn’t trust me anymore."],"High school reunions":["You know you're at a high school reunion when the principal's still the only one with a life.","You know you're getting old when the only thing classier than your high school reunion is the ambulance ride to it.","I went to a high school reunion and saw my old math teacher—she asked how I’m doing. I said, \"Great, I just got a 401(k) and a restraining order.\" She gave me an A for effort."],"Assembling flat-pack furniture (e.g., IKEA)":["I tried to assemble my IKEA bookshelf while drunk, and now it's a modern art installation called \"The Anger of a Man Who Can't Read Instructions.\"","I bought a bookshelf from IKEA, which was just a box of wood and a diagram that looked like a modern art masterpiece. Took me three hours and a philosophy degree to assemble it. Still waiting for the part where it actually holds books.","I tried assembling IKEA furniture once... turns out the hardest part was finding the part of my soul that still believed in clear instructions."],"Tech support/Helping parents with technology":["I offered to help my dad set up his new phone, and halfway through I realized he didn’t need tech support—he needed therapy and a will.","My mom asked for help setting up a smart TV, so I walked her through it step by step. Now she's watching Netflix in another room — with the TV on the floor.","\"Tech support told me to turn my router off and on again… which is exactly what my parents say when I complain about *them.*\""],"Alarm clocks and waking up early":["I hate alarm clocks — they’re the only coworkers who get paid nothing, yet still call you names like “failure” when you hit snooze.","I tried to wake up early to beat the rush, but my alarm clock just stared at me like, \"You're already late.\"","My alarm clock rings at 6 a.m. — I told it to wake me up at 7, but it’s clearly trying to make me a better version of myself."],"The culture of social media influencers":["I followed an influencer's 10-step skincare routine and ended up with 10 new products and a zit I can't pronounce.","Social media influencers are like chefs — they make everything look easy, but if you ever actually tried to cook what they eat, you'd realize they're just really good at editing.","I love how influencers act surprised when their 15th unboxing video gets 200 million views — honey, we’ve seen you open a box before, we just never cared that much."],"Cryptocurrencies or \"Tech Bros\"":["I don't trust a cryptocurrency that can't buy me a cup of coffee, but I trust a tech bro to convince me that it can.","I tried investing in cryptocurrency, but all I got was this lousy NFT of a cat wearing sunglasses — and even it thinks I’m a loser.","Blockchain, the only chain that's holding my savings and my dignity."],"Going to the dentist":["I went to the dentist and he said I was brushing too hard — I said, \"Well, you try scraping plaque off a set of teeth that won’t stop talking about their feelings.\"","I told my dentist I was afraid of needles, and he said, \"Don't worry, we'll just use a big one.\"","Going to the dentist is the only time I let someone stick their finger in my mouth... and it's *still* weird."],"Moving to a new apartment":["Moving to a new apartment is like dating someone new—you hope they have good storage and don’t leave wet towels on the floor.","Moving to a new apartment is like being a human Tetris game—except the boxes are all labeled “miscellaneous,” and gravity’s out to get you.","I told my landlord I was moving out because the showerhead was too strong — he said I was just being hard-headed."],"Annoying neighbors":["I used to think my neighbor was just loud, until I realized he was trying to teach the squirrels how to play the drums.","I’ve got one neighbor who insists on vacuuming at 3 a.m. Either he’s fighting a war against invisible dirt, or he’s trying to summon the ghost of Karen Carpenter.","I had a neighbor once who thought it was normal to yell movie lines at 2 a.m. I didn't even know *The Godfather* had a second act."],"Overpacking for a vacation":["I packed so much for my vacation, I had to check a bag just for the guilt.","I try to pack light, but my suitcase always ends up judging me. Luggage has drama I didn’t sign up for.","I overpacked so much that my suitcase started whispering, \"I think you're confusing me with a storage unit.\""],"Modern dating apps (Tinder, Bumble, etc.)":["Swipe right on a guy whose bio is just \"I’m like pizza—even when I’m bad, I’m good.\" Turns out he was allergic to commitment and kept topping my emotions with olives.","Swiping left on someone's profile is the modern version of saying \"nice hat\" while walking past a stranger.","I swipe right on a guy on Tinder, and his bio says, \"Loves travel, good food, and spontaneous road trips.\" I message him, \"So, what's the plan for the road trip *we're* about to embark on?\""],"Public transportation/Subways":["Subways are great until you realize you're not stuck in traffic—you're the traffic.","I love public transportation, especially when it's just me and a bunch of strangers silently judging each other's life choices.","Subways are like emotional support elevators — you’re squished with strangers for 20 minutes and no one says a word, but somehow, you emerge a slightly different person."],"Wedding planning":["Wedding planning is like assembling IKEA furniture, but instead of a bookshelf, you're building a fantasy, and there's no instruction manual—and the love of your life is timing you.","I told my fiancée I’d take care of the wedding music. She said, “Great, just make sure it’s not all funeral songs.” I said, “You mean *our* song isn’t ‘My Heart Will Go On’?”","I told my fiancé I wanted a small wedding, and she said, \"Okay, just 500 people and a 5-star venue.\" I said, \"That's not small!\" She said, \"It's small for us.\""],"Autocorrect text message fails":["My phone changed “I’ll be there in five” to “I’ll be there in fries.” Boss hasn’t trusted me since.","I told my mom I was dating a girl named \"Katie,\" but autocorrect changed it to \"Catie\" — now she's worried I'm seeing a cat.","I tried to text \"I'll be there in five,\" and autocorrect changed it to \"I'll be their fin.\" So now I'm just waiting for their fin to show up."],"Procrastination":["I procrastinate so much I have a full-time job just avoiding my other jobs.","I told myself I'd start organizing my life next year— turns out, I was just a one-year deadline away from a mid-life crisis.","I told my brain, \"Let's do this thing,\" and my brain replied, \"Challenge accepted... by the part of me that naps.\""],"Group chats that never stop buzzing":["Group chats are like a haunted house — the notifications never stop *dinging*, but somehow the only thing ghosting you is the guy who promised to bring snacks.","My group chat is like a beehive if the bees had no concept of boundaries and just buzzed 24/7 about their feelings.","I joined a group chat that's always buzzing, but I'm not sure if it's because everyone's talking or because the app is stuck in a loop of my grandma's cat sneezing."],"The cost of living/Being broke":["I used to worry about the cost of living, but now I just worry about the cost of existing — rent’s $2,000, my willpower’s $0.","I'm so broke, my bank account is like a GPS — it just says \"Recalculating...\" and never gives a direction.","I tried to save money by buying a cheap mattress, now I wake up feeling like I got mugged by a cloud."],"Getting a bad haircut":["I got a bad haircut, and now I look like I lost a game of 'let's see how long we can go without a mirror.'","I asked for a simple trim, and the barber gave me a new identity. I don’t even know myself anymore.","I got a haircut so bad, I’m considering joining a cult just to have an excuse to wear a hat 24/7."],"Overly complicated modern fitness trends":["You know you're living in the future when your workout involves a treadmill, a resistance band, and a spreadsheet.","Trying to do a plank now requires a 20-minute tutorial, a $300 smart mat, and three protein shakes. Just hold still, it’s not a TikTok algorithm.","I tried that new fitness trend where you lift groceries while doing lunges through an IKEA showroom — turns out, the only thing I'm building is a restraining order."],"People who talk at the movie theater":["I hate people who talk at the movie theater, but I especially hate the ones who whisper. You know what they're about to say before they say it, and it's always something like, \"I think that's the guy from *The Office*.\"","I tried to talk during the movie once, and the guy behind me shouted, \"Do you want to watch the film or just give a recap?\" Turns out, he was right — that's basically what I'm doing now.","If you're the person who narrates the movie for the entire theater, you're not a moviegoer — you're a podcast."],"Cooking disasters":["I once tried to make soup and ended up with a science experiment that my cat refused to touch. Turns out, I forgot to add the water.","I tried to make a soufflé once... it collapsed faster than my willpower at a buffet.","I tried to make a soufflé once and it collapsed harder than my self-esteem after a bad breakup."],"Small talk about the weather":["\"Talking about the weather is just adults doing improv comedy with a script written by disappointment.\"","I tried making small talk about the weather, but even the clouds rolled their eyes at me.","I asked the weather if it was going to rain today, and it said, \"Maybe, but I'm not commitment-oriented.\""],"Modern fashion trends":["You know you're living in a modern fashion trend when your jeans are tighter than your ex's personality and your sneakers are more expensive than your car.","I tried to get into the latest fashion trend where people pay extra for holes in their clothes. Got real excited until I realized the holes were *in* the pants, not *in* the bank account.","Wearing pants that end above the ankles is now called \"statement-making,\" which is just fashionable code for \"I bought the wrong size.\""],"Waiting in doctors' offices":["I’ve learned that waiting in a doctor’s office is just society’s way of saying, “You’re not important—now wait in the land of expired magazines and sad children.”","\"Waiting in a doctor's office is the only time I'd trade my smartphone for a magazine from 2003 with a missing corner.\"","Waiting in doctors' offices is like waiting for a text from someone who's never online."],"Getting older/Turning 30":["I woke up one day and realized half my friends are dead and the other half are on LinkedIn.","Turning thirty is like getting a software update—you didn’t ask for it, you’re not sure what changed, but now everything feels slower and you’re suddenly obsessed with backups.","I turned 30 and realized my body is just a rental — the lease is up, the maintenance fees are through the roof, and the warranty expired the day I hit 25."],"Video game culture":["I love when people say “I’m playing hard mode” like it’s a personality trait.","I hate when people say \"I don't have time to play video games,\" like they're not aware that I've been playing them with my eyes closed for 10 years.","I tried to explain to my grandma that I \"beat the final boss,\" and now she won’t stop trying to get me to fight her in chess. Checkmate, Nana — but I came to negotiate, not to blow things up."],"Corporate buzzwords (e.g., \"Synergy\")":["\"Synergy\" is just what they call it when three managers stare at the same problem and no one does anything.","Trying to explain my job using buzzwords is like trying to build a house with only hammers and enthusiasm — it’s all synergy and no structure.","I tried to use \"synergy\" in a sentence, but my boss said I was just repeating myself — he didn't want to hear about the \"cross-functional team\" I was on."],"Dealing with landlords":["I told my landlord his rent increase was like a horror movie — it had a slow build, a shocking revelation, and left me screaming into the void. He said I wasn't \"contractually obligated\" to be that dramatic.","I told my landlord I was going to start a band, he said, \"Great, but can you at least pay rent on time? I can't schedule a show with a bunch of guys who can't hold a note and a tenant who can't hold a check.\"","I asked my landlord if the apartment included a gym, and he said, \"No, but the stairs are free.\""],"Astrological signs/Horoscopes":["I told my zodiac sign I was breaking up, and it said, \"But we're meant to be!\" I said, \"Yeah, I know, that's why I'm going to find someone who's not on my level.\"","I checked my horoscope this morning and it said I'd have a lucky day—turns out the \"lucky\" part was the only part they got right.","I checked my horoscope, and it said today is a great day to reconnect with someone from your past—so I texted my ex. Turned out, the universe meant your *dentist*."],"People who overshare online":["I don't trust people who overshare online — they're the reason I now know what your breakfast tasted like, where you got your hair cut, and why you're mad at your ex.","People who overshare online are like uninvited guests who brought a PowerPoint.","I follow this guy on social media who posts everything—like, *everything*. Yesterday he live-streamed his colonoscopy and made a TikTok with the anesthesia voiceover."],"Veganism or extreme dietary restrictions":["I tried veganism for a week, then realized my body was just mad about the lack of cheese.","I went vegan for a week and now I'm just a sad person who stares at fruit.","I tried being vegan for a month—now I’m just a guy who spends 45 minutes reading restaurant menus like I’m solving a crime."],"Trying to assemble a tent/Camping":["Every time I try to assemble a tent, it's like the poles are playing hide-and-seek... and the instructions are written in hieroglyphs.","I tried to assemble a tent like it was a puzzle, but now I'm 99% sure the instructions were written in a language that doesn't exist anymore.","Trying to assemble a tent is like solving a 3D puzzle... if the puzzle pieces were controlled by a sadistic child who only speaks in Ikea manuals."]};
+const LABELS = ["A", "B", "C"];
+
+// Split themes into two groups for Mode 2
+const SPLIT    = Math.floor(THEMES.length / 2);
+const THEMES_L = THEMES.slice(0, SPLIT);
+const THEMES_R = THEMES.slice(SPLIT);
+const SPLIT_LEN = Math.min(THEMES_L.length, THEMES_R.length);
+
+let current   = 0;   // shared index (Mode 1 = all themes, Mode 2 = step within each group)
+let mode      = 1;
+
+// ── Timer / auto-advance ───────────────────────────────────────────────────
+const INTERVAL_SECS = 60;   // seconds per theme
+let timerRunning = false;
+let secondsLeft  = INTERVAL_SECS;
+let timerHandle  = null;
+
+function fmtTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+function updateTimerUI() {
+  const el = document.getElementById('timer');
+  el.textContent = fmtTime(secondsLeft);
+  el.classList.toggle('running', timerRunning);
+  document.getElementById('play-btn').innerHTML =
+    timerRunning ? '&#9646;&#9646; Pause' : '&#9654; Play';
+}
+
+function timerTick() {
+  secondsLeft--;
+  if (secondsLeft <= 0) {
+    // auto-advance
+    const maxIdx = mode === 2 ? SPLIT_LEN - 1 : THEMES.length - 1;
+    if (current < maxIdx) {
+      current++;
+      render();
+      window.scrollTo(0, 0);
+    } else {
+      // reached the end — stop
+      timerRunning = false;
+      clearInterval(timerHandle);
+      timerHandle = null;
+    }
+    secondsLeft = INTERVAL_SECS;
+  }
+  updateTimerUI();
+}
+
+function togglePlay() {
+  timerRunning = !timerRunning;
+  if (timerRunning) {
+    secondsLeft = INTERVAL_SECS;
+    timerHandle = setInterval(timerTick, 1000);
+  } else {
+    clearInterval(timerHandle);
+    timerHandle = null;
+    secondsLeft = INTERVAL_SECS;
+  }
+  updateTimerUI();
+}
+
+function navigate(dir) {
+  const maxIdx = mode === 2 ? SPLIT_LEN - 1 : THEMES.length - 1;
+  current = Math.max(0, Math.min(maxIdx, current + dir));
+  if (timerRunning) secondsLeft = INTERVAL_SECS;   // reset countdown on manual nav
+  updateTimerUI();
+  render();
+  window.scrollTo(0, 0);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft')  navigate(-1);
+  if (e.key === 'ArrowRight') navigate(1);
+});
+
+function toggleMode() {
+  mode = mode === 1 ? 2 : 1;
+  current = 0;   // reset position when switching modes
+  if (timerRunning) secondsLeft = INTERVAL_SECS;   // reset countdown
+  updateTimerUI();
+  document.getElementById('mode-btn').textContent = mode === 1 ? 'Mode 2' : 'Mode 1';
+  document.body.classList.toggle('mode2', mode === 2);
+  render();
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function makeBlock(label, joke) {
+  return `<div class="joke-block">
+    <div class="joke-label">Joke ${esc(label)}</div>
+    <div class="joke-text">${esc(joke)}</div>
+  </div>`;
+}
+
+// ── Render one Mode-2 half in-place ────────────────────────────────────────
+function renderHalf(side, themeList, idx) {
+  const theme = themeList[idx];
+  const jokes = DATA[theme];
+  const half  = document.getElementById('half-' + side);
+  if (!half) return;
+
+  half.querySelector('.half-theme-label').textContent = theme;
+
+  const jokesDiv = half.querySelector('.half-jokes');
+  jokesDiv.innerHTML = '';
+  jokes.forEach((joke, i) => jokesDiv.insertAdjacentHTML('beforeend', makeBlock(LABELS[i], joke)));
+}
+
+// ── Main render ─────────────────────────────────────────────────────────────
+function render() {
+  const stage = document.getElementById('stage');
+  stage.innerHTML = '';
+
+  if (mode === 1) {
+    const theme = THEMES[current];
+    const jokes = DATA[theme];
+
+    document.getElementById('theme-label').textContent = theme;
+    document.getElementById('counter').textContent     = (current + 1) + ' / ' + THEMES.length;
+    document.getElementById('prev-btn').disabled       = current === 0;
+    document.getElementById('next-btn').disabled       = current === THEMES.length - 1;
+
+    jokes.forEach((joke, i) => stage.insertAdjacentHTML('beforeend', makeBlock(LABELS[i], joke)));
+
+  } else {
+    // Shared counter in topbar
+    document.getElementById('counter').textContent     = (current + 1) + ' / ' + SPLIT_LEN;
+    document.getElementById('prev-btn').disabled = current === 0;
+    document.getElementById('next-btn').disabled = current === SPLIT_LEN - 1;
+
+    // Build left half
+    const left = document.createElement('div');
+    left.className = 'half half-left';
+    left.id = 'half-left';
+    left.innerHTML = '<div class="half-theme-label"></div><div class="half-jokes"></div>';
+    stage.appendChild(left);
+
+    // Build right half
+    const right = document.createElement('div');
+    right.className = 'half half-right';
+    right.id = 'half-right';
+    right.innerHTML = '<div class="half-theme-label"></div><div class="half-jokes"></div>';
+    stage.appendChild(right);
+
+    renderHalf('left',  THEMES_L, current);
+    renderHalf('right', THEMES_R, current);
+  }
+}
+
+render();
+</script>
+</body>
+</html>

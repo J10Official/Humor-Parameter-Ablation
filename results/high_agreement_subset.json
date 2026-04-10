@@ -1,0 +1,218 @@
+{
+  "high_agreement": {
+    "n_themes": 22,
+    "n_ratings": 132,
+    "n_blocks": 132,
+    "mean_ranks": {
+      "32B": 2.022727272727273,
+      "30A3": 2.143939393939394,
+      "235A22": 1.8333333333333333
+    },
+    "themes": [
+      "Annoying neighbors",
+      "Astrological signs/Horoscopes",
+      "Awkward family gatherings",
+      "Buying things you don't need online",
+      "Coffee shop baristas and complicated orders",
+      "Cooking disasters",
+      "Cryptocurrencies or \"Tech Bros\"",
+      "Forgetting passwords",
+      "Getting a bad haircut",
+      "Getting older/Turning 30",
+      "Group chats that never stop buzzing",
+      "Job interviews",
+      "Modern fashion trends",
+      "Overly complicated modern fitness trends",
+      "People who overshare online",
+      "People who talk at the movie theater",
+      "Procrastination",
+      "Streaming service algorithms (e.g., Netflix recommendations)",
+      "The cost of living/Being broke",
+      "Trying to assemble a tent/Camping",
+      "Veganism or extreme dietary restrictions",
+      "Waiting in doctors' offices"
+    ],
+    "friedman_chi2": 6.469696969696997,
+    "friedman_p": 0.03936616905933657,
+    "wilcoxon": {
+      "32B_vs_30A3": {
+        "W": 3916.5,
+        "p": 0.2592388648086722,
+        "significant": false
+      },
+      "32B_vs_235A22": {
+        "W": 3702.0,
+        "p": 0.10431672857755439,
+        "significant": false
+      },
+      "30A3_vs_235A22": {
+        "W": 3404.0,
+        "p": 0.019867570473584038,
+        "significant": true
+      }
+    }
+  },
+  "low_agreement": {
+    "n_themes": 18,
+    "n_ratings": 108,
+    "n_blocks": 108,
+    "mean_ranks": {
+      "32B": 2.0462962962962963,
+      "30A3": 1.9722222222222223,
+      "235A22": 1.9814814814814814
+    },
+    "themes": [
+      "Alarm clocks and waking up early",
+      "Assembling flat-pack furniture (e.g., IKEA)",
+      "Autocorrect text message fails",
+      "Commuting in heavy traffic",
+      "Corporate buzzwords (e.g., \"Synergy\")",
+      "Dealing with landlords",
+      "Going to the dentist",
+      "High school reunions",
+      "Keeping houseplants alive",
+      "Modern dating apps (Tinder, Bumble, etc.)",
+      "Moving to a new apartment",
+      "Overpacking for a vacation",
+      "Public transportation/Subways",
+      "Small talk about the weather",
+      "Tech support/Helping parents with technology",
+      "The culture of social media influencers",
+      "Video game culture",
+      "Wedding planning"
+    ],
+    "friedman_chi2": 0.35185185185173395,
+    "friedman_p": 0.8386801054885331,
+    "wilcoxon": {
+      "32B_vs_30A3": {
+        "W": 2785.0,
+        "p": 0.6100761784245785,
+        "significant": false
+      },
+      "32B_vs_235A22": {
+        "W": 2773.0,
+        "p": 0.5877856912100416,
+        "significant": false
+      },
+      "30A3_vs_235A22": {
+        "W": 2897.0,
+        "p": 0.8833911469113612,
+        "significant": false
+      }
+    }
+  },
+  "all": {
+    "n_themes": 40,
+    "n_ratings": 240,
+    "n_blocks": 240,
+    "mean_ranks": {
+      "32B": 2.033333333333333,
+      "30A3": 2.066666666666667,
+      "235A22": 1.9
+    },
+    "themes": [
+      "Alarm clocks and waking up early",
+      "Annoying neighbors",
+      "Assembling flat-pack furniture (e.g., IKEA)",
+      "Astrological signs/Horoscopes",
+      "Autocorrect text message fails",
+      "Awkward family gatherings",
+      "Buying things you don't need online",
+      "Coffee shop baristas and complicated orders",
+      "Commuting in heavy traffic",
+      "Cooking disasters",
+      "Corporate buzzwords (e.g., \"Synergy\")",
+      "Cryptocurrencies or \"Tech Bros\"",
+      "Dealing with landlords",
+      "Forgetting passwords",
+      "Getting a bad haircut",
+      "Getting older/Turning 30",
+      "Going to the dentist",
+      "Group chats that never stop buzzing",
+      "High school reunions",
+      "Job interviews",
+      "Keeping houseplants alive",
+      "Modern dating apps (Tinder, Bumble, etc.)",
+      "Modern fashion trends",
+      "Moving to a new apartment",
+      "Overly complicated modern fitness trends",
+      "Overpacking for a vacation",
+      "People who overshare online",
+      "People who talk at the movie theater",
+      "Procrastination",
+      "Public transportation/Subways",
+      "Small talk about the weather",
+      "Streaming service algorithms (e.g., Netflix recommendations)",
+      "Tech support/Helping parents with technology",
+      "The cost of living/Being broke",
+      "The culture of social media influencers",
+      "Trying to assemble a tent/Camping",
+      "Veganism or extreme dietary restrictions",
+      "Video game culture",
+      "Waiting in doctors' offices",
+      "Wedding planning"
+    ],
+    "friedman_chi2": 3.733333333333121,
+    "friedman_p": 0.15463826454927118,
+    "wilcoxon": {
+      "32B_vs_30A3": {
+        "W": 13946.5,
+        "p": 0.6157204056795282,
+        "significant": false
+      },
+      "32B_vs_235A22": {
+        "W": 12837.5,
+        "p": 0.11673614073106357,
+        "significant": false
+      },
+      "30A3_vs_235A22": {
+        "W": 12782.5,
+        "p": 0.10484720779923731,
+        "significant": false
+      }
+    }
+  },
+  "per_theme_agreement": {
+    "Astrological signs/Horoscopes": 1.0,
+    "Trying to assemble a tent/Camping": 1.0,
+    "Getting a bad haircut": 0.6666666666666666,
+    "People who talk at the movie theater": 0.6666666666666666,
+    "Getting older/Turning 30": 0.6666666666666666,
+    "Coffee shop baristas and complicated orders": 0.6666666666666666,
+    "Procrastination": 0.4666666666666667,
+    "The cost of living/Being broke": 0.4666666666666667,
+    "Veganism or extreme dietary restrictions": 0.4666666666666667,
+    "Awkward family gatherings": 0.4666666666666667,
+    "Group chats that never stop buzzing": 0.4,
+    "Overly complicated modern fitness trends": 0.4,
+    "Cooking disasters": 0.4,
+    "Modern fashion trends": 0.4,
+    "Waiting in doctors' offices": 0.4,
+    "People who overshare online": 0.4,
+    "Buying things you don't need online": 0.4,
+    "Streaming service algorithms (e.g., Netflix recommendations)": 0.4,
+    "Job interviews": 0.4,
+    "Forgetting passwords": 0.4,
+    "Cryptocurrencies or \"Tech Bros\"": 0.4,
+    "Annoying neighbors": 0.4,
+    "Wedding planning": 0.26666666666666666,
+    "Autocorrect text message fails": 0.26666666666666666,
+    "Video game culture": 0.26666666666666666,
+    "Corporate buzzwords (e.g., \"Synergy\")": 0.26666666666666666,
+    "Commuting in heavy traffic": 0.26666666666666666,
+    "Keeping houseplants alive": 0.26666666666666666,
+    "High school reunions": 0.26666666666666666,
+    "Assembling flat-pack furniture (e.g., IKEA)": 0.26666666666666666,
+    "Alarm clocks and waking up early": 0.26666666666666666,
+    "Going to the dentist": 0.26666666666666666,
+    "Moving to a new apartment": 0.26666666666666666,
+    "Modern dating apps (Tinder, Bumble, etc.)": 0.26666666666666666,
+    "Public transportation/Subways": 0.26666666666666666,
+    "Small talk about the weather": 0.2,
+    "Dealing with landlords": 0.2,
+    "Tech support/Helping parents with technology": 0.2,
+    "The culture of social media influencers": 0.2,
+    "Overpacking for a vacation": 0.2
+  },
+  "agreement_threshold": 0.4
+}
