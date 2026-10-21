@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite the published paper listed below."
+title: "Does Bigger Mean Funnier? Evaluating Humor Generation Across the Qwen3 Model Family"
+type: software
+authors:
+  - family-names: Agrawal
+    given-names: Jatin
+  - family-names: Mamidi
+    given-names: Radhika
+url: "https://aclanthology.org/2026.chum-1.7/"
+preferred-citation:
+  type: conference-paper
+  title: "Does Bigger Mean Funnier? Evaluating Humor Generation Across the Qwen3 Model Family"
+  authors:
+    - family-names: Agrawal
+      given-names: Jatin
+    - family-names: Mamidi
+      given-names: Radhika
+  year: 2026
+  collection-title: "Proceedings of the 2nd Workshop on Computational Humor (CHum 2026)"
+  start: "81"
+  end: "94"
+  doi: "10.18653/v1/2026.chum-1.7"
+  url: "https://aclanthology.org/2026.chum-1.7/"
+  publisher:
+    name: Association for Computational Linguistics
