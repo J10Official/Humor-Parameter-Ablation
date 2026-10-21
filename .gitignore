@@ -1,0 +1,10 @@
+# Local environment and generated caches
+.env
+.env.*
+!.env.example
+!.env.sample
+__pycache__/
+*.py[cod]
+.venv/
+node_modules/
+*:Zone.Identifier
